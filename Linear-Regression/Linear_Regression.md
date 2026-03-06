@@ -55,12 +55,20 @@ Error = Actual value - predicted value
 
 Calculate MSE (Mean Square Error) = ((2 x 2) + (4 x 4) + (6 x 6)) / 3
 
-MSE = 18.6
+MSE = 18.67
 
 So, 18.6 is error. Algorithms wants to update value of m and b in such way that MSE reduces. So, algorithm needs to know how m and b influences MSE. That is,
 
 ```
 If I change m by tiny amount, how much does MSE change?
+```
+
+```
+This rate of change is called the derivative.
+```
+
+```
+Gradient tells us how much the MSE changes when we slightly change m or b.
 ```
 
 _This is how Gradient Descent comes in picture_
