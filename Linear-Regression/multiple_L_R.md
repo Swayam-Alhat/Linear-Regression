@@ -1,6 +1,23 @@
 # Multiple Linear Regression
 
-## Explaination about why we need feature scaling
+define multiple linear regression
+
+## Check if data is linear
+
+Before getting into feature scaling, we should make sure that our training data is linear. i.e does each feature have a linear relationship with target.
+
+Linear Regression should be used for learning only when training data is linear i.e features have linear relationship with target.
+
+Example, if we have features _house size_ & _number of bedrooms_ for target _house price_, we should check if both features i.e _house size_ and _number of bedrooms_ have linear relationship with target i.e _house price_.
+
+This is done by plotting graph (scatter plot) of each feature against target. If you see a roughly straight line trend, the relationship is linear. If it's curved or random, it's not.
+
+```
+   x-axis → feature (e.g. house size)
+   y-axis → target (house price)
+```
+
+## Why we need Feature Scaling
 
 > Explaination is based around linear regression algorithm. i.e Why **feature scaling** is important specifically for **Linear Regression**
 
@@ -13,3 +30,5 @@ Feature scaling solves this by bringing all features into the same range, making
 #### Summary
 
 Gradient magnitude depends on feature range → different features produce different magnitude gradients → one learning rate can't handle all of them properly → either overshoots for some or crawls for others → scaling fixes this by bringing all gradients into comparable range
+
+> There are several ways to scale features. **Standardization** is used as it does not get affected by outliers.
