@@ -43,7 +43,37 @@ df["bedrooms"] = (df["bedrooms"] - df["bedrooms"].mean()) / df["bedrooms"].std()
 train_df = df.iloc[0:431,:]
 test_df = df.iloc[431:,:]
 
-# actual implementation of algorithm 
+# actual implementation of algorithm
+
+learning_rate = 0.000001
+m1 = 0
+m2 = 0
+b = 0
+N = len(train_df)
+
+epoch = 1000
 
 
+for i in range(epoch):
 
+    # predict y for each x
+    # it returns new series object
+    predicted_y = (m1 * train_df["area"]) + (m2 * train_df["bedrooms"]) + b
+
+    # calculate error
+    errors = train_df["price"] - predicted_y
+
+    # calculate MSE
+    MSE = (sum(errors ** 2)) / len(errors)
+
+    # calculate gradient
+    grad_m1 = (-2 / N) * (sum(errors * train_df["area"]))
+    grad_m2 = (-2 / N) * (sum(errors * train_df["bedrooms"]))
+    grad_b = (-2 / N) * sum(errors)
+
+    # update m1, m2 and b
+    m1 = m1 - learning_rate * grad_m1
+    m2 = m2 - learning_rate * grad_m2
+    b = b - learning_rate * grad_b
+
+print(MSE)
