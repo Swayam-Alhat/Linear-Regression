@@ -76,4 +76,5 @@ Following are Reinforcement algorithms -
 1. Q-Learning
 2. Deep Q-Network - DQN
 
-> For ML algorithms, check the individual folders — each has a README and implementation.
+> [!NOTE]  
+> Above are folders which contains implementations of ML algorithms
