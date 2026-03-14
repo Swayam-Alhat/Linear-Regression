@@ -99,7 +99,8 @@ plt.show()
 
 # plot regression line
 plt.scatter(train_df["area"],train_df["price"], color="red")
-plt.plot(train_df["area"],predicted_y, color="black")
+# we sort for regression line because line connects points sequentially. So if we dont sort, line will be not straight. SO sort it
+plt.plot(train_df["area"].sort_values(),predicted_y.sort_values(), color="black")
 plt.show()
 
 
