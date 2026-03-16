@@ -1,7 +1,6 @@
 # ML From Scratch
 
-Implementing Machine Learning algorithms from scratch in Python
-— without using ML libraries like Scikit-learn.
+Implementing Machine Learning algorithms from scratch in Python i.e without using ML libraries like Scikit-learn.
 
 ## Algorithms
 
