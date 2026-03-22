@@ -2,7 +2,7 @@
 
 Linear Regression is supervised ML algorithm. Meaning it learns from labeled data.
 
-Its main goal is to find best fit straight line on graph of training data. That is, find the linear equation (represented in slope intercept form i.e y = mx + b) which calculates/predicts y for training data. And then compare actual y with predicted y so to calculate MSE and further Gradient which helps to update m and b.
+Its goal is to find the linear equation (i.e a straight line) on training data graph which best fits training data. That is, that line covers most of the data points
 
 > Note : Actually m and b values are updated at each iteration.
 
