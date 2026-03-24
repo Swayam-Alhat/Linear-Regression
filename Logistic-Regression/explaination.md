@@ -55,6 +55,6 @@ p(x) = $`\frac{e^{b_0 + b_1 . x_1}}{1 + e^{b_0 + b_1 . x_1}}`$
 > [!NOTE]  
 > The above form is equivalent to the more common compact form:
 > $$p(x) = \frac{1}{1 + e^{-(b_0 + b_1 x_1)}}$$
-> Multiply numerator and denominator by $ e^{-(b_0 + b_1 . x_1)} $ and solve it. We will get commonly used Sigmoid function form
+> Multiply numerator and denominator by $`e^{-(b_0 + b_1 . x_1)}`$ and solve it. We will get commonly used Sigmoid function form
 
 This transformation allows logistic regression to output valid probabilities, even though we’re modeling them using a linear function underneath.
