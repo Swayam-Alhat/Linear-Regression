@@ -147,4 +147,72 @@ $`L(\theta)`$ - means Likelihood of current parameters (weights and bias) to be 
 $`\prod_{i=1}^{n}`$ - means product of all data points. Meaning perform $`[y_p]^{y} . [1 - y_p]^{1 - y}`$ for each data points and then multiply all of them to get single value of likelihood
 
 $`[y_p]^{y} . [1 - y_p]^{1 - y}`$ - This operation gives $`L(\theta)`$ (likelihood of current parameters to be optimal) for a single data point.  
-We perform this for each data point and take product of the all resulted values
+\*We perform this operation for each data point and take product of the all resulted values to get single **global likelihood of current parameters of being optimal\***
+
+$`L(\theta) = \prod_{i=1}^{n} [y_p]^{y} . [1 - y_p]^{1 - y}`$
+
+This likelihood function outputs -
+
+- value close to 1, if prediction $`y_p`$ matches or close to actual true value $`y`$
+- value close to 0, if prediction $`y_p`$ is _NOT_ close to actual true value $`y`$
+
+Example,
+
+**Case 1** - When prediction is close to actual value, meaning , **prediction is correct**
+
+> $`y_p`$ is sigmoid output
+
+Let,  
+prediction $`y_p`$ = 0.999  
+Actual true value $`y`$ = 1
+
+> As _prediction_ is close to _actual value_, we get to know that for this data point, **m** and **b** (parameters) are optimal.  
+> Lets check it by using _Likelihood function_
+
+> $`L(\theta) =  [y_p]^{y} . [1 - y_p]^{1 - y}`$
+
+> This above likelihood formula is for single data point
+
+```console
+>>> 0.999**1 * (1 - 0.999)**0
+0.999
+```
+
+So, when prediction $`y_p`$ is close to actual value $`y`$, meaning, prediction is accurate, then $`L(\theta)`$ outputs value close to 1, indicating current parameters (m and b) are optimal.
+
+**Case 2** - When prediction is _NOT_ close to actual value, meaning , **prediction is incorrect**
+
+Let,  
+prediction $`y_p`$ = 0.999  
+Actual true value $`y`$ = 0
+
+> Here, actual true value $`y`$ is 0 and prediction $`y_p`$ is 0.999 (almost close to 1). **So the prediction is incorrect**
+
+```console
+>>> 0.999**0 * (1 - 0.999)**1
+0.0010000000000000009
+```
+
+So, $`L(\theta)`$ is close to 0, indicating current values of m and b are not optimal
+
+So, likelihood $`L(\theta)`$ represents if current parameters (m and b) are optimal.
+
+- If $`L(\theta)`$ outputs value close to 1, meaning prediction is accurate, then current parameters (m and b) are optimal
+
+* If $`L(\theta)`$ outputs value close to 0, meaning prediction is _NOT_ accurate, then current parameters (m and b) are _NOT_ optimal
+
+> Algorithm calculates likelihood for each data points, then take product of all of them to get **_global Likelhood estimate_**
+
+### But
+
+This formula has some flaws -
+
+- numerical underflow (multiplying hundreds of tiny probabilities together approaches zero and breaks floating point)  
+  **_solution - Take Logarithm of whole function_**
+
+- We want to apply gradient descent for optimization and gradient descent minimizes.  
+  **_solution - multiply with_** $`(-1)`$
+
+- As we apply Logarithm, **product** converts into **sum**.  
+  **_solution - divide it by n (total number of data points)_**  
+  **_Multiply with_** $`\frac{1}{n}`$
