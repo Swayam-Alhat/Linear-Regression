@@ -135,4 +135,16 @@ _Incorrect prediction means current values of `m` and `b` are not optimal_
 
 **Now, $`y_p`$ is predicted value for current values of m and b (weights and bias)**
 
-But, to find the optimal values of m and b, we need a function/equation that tells the likelihood that current weights are being optimal
+##### But, to find the optimal values of `m` and `b`, we need a function/equation that tells the likelihood that current weights and bias are optimal.
+
+Here comes Likelihood formula -
+
+$`L(\theta) = \prod_{i=1}^{n} [y_p]^{y} . [1 - y_p]^{1 - y}`$
+
+where,  
+$`L(\theta)`$ - means Likelihood of current parameters (weights and bias) to be optimal
+
+$`\prod_{i=1}^{n}`$ - means product of all data points. Meaning perform $`[y_p]^{y} . [1 - y_p]^{1 - y}`$ for each data points and then multiply all of them to get single value of likelihood
+
+$`[y_p]^{y} . [1 - y_p]^{1 - y}`$ - This operation gives $`L(\theta)`$ (likelihood of current parameters to be optimal) for a single data point.  
+We perform this for each data point and take product of the all resulted values
