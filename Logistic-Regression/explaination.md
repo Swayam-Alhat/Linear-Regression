@@ -214,8 +214,8 @@ This formula has some flaws -
 
   **_solution - multiply with_** $`(-1)`$
 
-  > [!NOTE]  
-  > Read about gradient descent from Gradient-descent.md file
+> [!NOTE]  
+> Read about gradient descent from Gradient-descent.md file
 
 - As we apply Logarithm, **product** converts into **sum**.  
   **_solution - divide it by n (total number of data points)_**  
@@ -225,10 +225,8 @@ Applying above mentioned changes
 
 log($`L(\theta)`$) = $`\sum_{i=1}^{n}`$ $` log ([y_p]^{y} . [1 - y_p]^{1 - y})`$
 
-```
 since
-log(a,b) = log(a) + log(b)
-```
+$`log(a,b) = log(a) + log(b)`$
 
 log($`L(\theta)`$) = $`\sum_{i=1}^{n}`$ $`log([y_p]^{y}) + log([1 - y_p]^{1 - y})`$
 
