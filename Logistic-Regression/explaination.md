@@ -174,3 +174,14 @@ log($`L(\theta)`$) = $` \frac{-1}{n} \sum_{i=1}^{n} y . log(y_p) + (1 - y) . log
 > $`J(\theta) =  \frac{-1}{n} \sum_{i=1}^{n} [y . log(y_p) + (1 - y) . log(1 - y_p)]`$
 
 #### This is Cross Entropy loss function
+
+**_This is what we minimizes using gradient descent_**
+
+> [!NOTE]
+> Basically, we **_maximize_** the function as we want the value close to **1**, but **_gradient descent_** formula is fixed and it always **_minimizes_**. Thats why, we flipped function curve by negating it (**_multiplied with -1_**). So. now we use original gradient descent (which minimizes) but as we flipped the sides, we are actually maximizing the function
+
+#### Here comes Gradient descent which allows us to minimize the function
+
+So after calculating partial derivative of cross entropy w.r.t $`\theta`$ (single parameter), we get
+
+$` gradient(\theta) = \frac{1}{n} x ( y - y_p)`$
