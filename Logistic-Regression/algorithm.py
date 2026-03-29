@@ -21,7 +21,7 @@ train_Y = df.iloc[:373,-1]
 test_X = df.iloc[373:,:-1]
 test_Y = df.iloc[373:,-1]
 
-# feature scaling on training data
+# feature scaling on training data (Standardization)
 
 # save mean and std of training data.
 # because we should not use mean and std of already scaled training data
