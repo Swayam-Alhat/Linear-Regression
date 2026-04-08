@@ -6,7 +6,7 @@ Implementing Machine Learning algorithms from scratch in Python i.e without usin
 
 - Linear Regression
 - Logistic Regression
-- Decision Trees
+- Decision Trees (CART)
 - KNN
 - K-means clustering
 
