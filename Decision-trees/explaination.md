@@ -4,165 +4,208 @@
 
 A decision tree is an ML algorithm that learns patterns from data and predicts outcomes for new unseen data. It forms a tree-like structure made of nodes and branches — essentially a flowchart of questions that leads to a prediction.
 
-Each node in the tree represents a feature (like Glucose, Age, BMI). Each branch represents a split based on that feature's value. At the bottom are leaf nodes — these give the final prediction.
+Each node in the tree represents a feature (like Glucose, Age, Insulin). Each branch represents a split based on that feature's value. At the bottom are leaf nodes — these give the final prediction.
 
 ---
 
-## How It Works
+## How the Algorithm Learns
 
-### 1. The core idea
+The core idea is simple:
 
-The algorithm wants to ask the most important question first. "Most important" means — which feature, when split at the right value, best separates the target classes?
+> **Find the feature and threshold that best separates the data into two classes (0 and 1), then repeat on each resulting subset.**
 
-For example, if we want to predict whether a patient is diabetic, we want a feature that clearly divides diabetic vs non-diabetic patients into two groups. That feature becomes the root node (the first question).
+This is done by measuring **Gini impurity** — a score that tells how mixed a group is. A Gini of `0` means the group is perfectly pure (all one class). A Gini of `0.5` means it's perfectly mixed (50/50 split).
 
-### 2. How it finds the best feature
+### Gini Impurity Formula
 
-For every feature in the dataset, the algorithm:
+$$Gini = 1 - (p_0^2 + p_1^2)$$
 
-- Tries every possible split threshold (e.g. Glucose <= 85, Glucose <= 105, Glucose <= 135...)
-- Each threshold splits the data into two groups (left and right)
-- It checks how **pure** each group is — meaning, does each group contain mostly one class?
-- Picks the threshold that creates the purest groups for that feature
+Where $p_0$ and $p_1$ are the proportions of class 0 and class 1 in the node.
 
-Then it compares the best split from every feature and picks the overall winner. That winner becomes the node.
+When evaluating a split, the Gini scores of both child nodes are combined into a **weighted Gini**:
 
-Purity is measured using **Gini Impurity** — a number from 0 to 0.5. A value of 0 means the group is perfectly pure (all same class). A value of 0.5 means completely mixed.
+$$Weighted\ Gini = \frac{n_{left}}{n_{total}} \times Gini_{left} + \frac{n_{right}}{n_{total}} \times Gini_{right}$$
 
-### 3. It repeats recursively
+The split with the **lowest weighted Gini** wins.
 
-After the first split creates two groups, the algorithm goes into each group separately and runs the exact same process again — find the best feature and best split for that subset of data. It keeps doing this until the groups are pure enough, or until a stopping condition is met (like max depth, or minimum samples in a node).
+### Step-by-Step: How the Tree is Built
 
-### 4. Prediction on new data
+**Step 1 — Find the best split**
 
-To predict, simply walk the new sample down the tree — at each node, check the condition, go left or right, and keep going until you hit a leaf. The leaf gives the prediction (majority class of training samples that ended up there).
+For every feature:
 
----
+- Sort its unique values and compute candidate thresholds (midpoints between consecutive values)
+- For each threshold, split the data into left (≤ threshold) and right (> threshold)
+- Calculate weighted Gini for that split
+- Pick the threshold with the lowest weighted Gini → this is the **best split for that feature**
 
-## Full Example — Feature Selection Step by Step
+Repeat for all features. The feature + threshold with the globally lowest weighted Gini becomes the **node**.
 
-### Dataset
+**Step 2 — Split and recurse**
 
-5 patients, 2 features, target = Diabetic (1) or Not Diabetic (0).
+The data is divided into two subsets based on the winning split. For each subset, the algorithm checks:
 
-| Patient | Glucose | Age | Diabetic? |
-| ------- | ------- | --- | --------- |
-| P1      | 80      | 25  | 0         |
-| P2      | 90      | 35  | 0         |
-| P3      | 120     | 45  | 1         |
-| P4      | 150     | 55  | 1         |
-| P5      | 160     | 60  | 1         |
+- Is this node **pure enough**? (≥ 90% of samples belong to one class) → assign that class as a leaf node, stop
+- Is this node **too small**? (fewer than 5 samples after a split) → assign the majority class, stop
+- Otherwise → go back to **Step 1** and find the best split for this subset
 
----
+This recursion continues until every branch ends at a leaf node.
 
-### Step 1 — Try all splits for Glucose
+### Example
 
-Thresholds tried: midpoints between sorted unique values → 85, 105, 135, 155
+Take the root split: **Glucose ≤ 154.5**
 
-**Glucose <= 85**
-
-- Left: P1 → targets: [0] → pure ✅
-- Right: P2, P3, P4, P5 → targets: [0, 1, 1, 1] → mixed ❌
-
-**Glucose <= 105**
-
-- Left: P1, P2 → targets: [0, 0] → pure ✅
-- Right: P3, P4, P5 → targets: [1, 1, 1] → pure ✅
-- **Perfect split! 🎯**
-
-**Glucose <= 135**
-
-- Left: P1, P2, P3 → targets: [0, 0, 1] → mixed ❌
-- Right: P4, P5 → targets: [1, 1] → pure ✅
-
-**Glucose <= 155**
-
-- Left: P1, P2, P3, P4 → targets: [0, 0, 1, 1] → mixed ❌
-- Right: P5 → targets: [1] → pure ✅
-
-**Best split for Glucose → Glucose <= 105** (both sides pure)
-
-> [!NOTE]
-> **_Gini impurity_** of each feature split represent whether the current split best seprates the target values. That is, if we have **_Glucose <= 105_** as best split. Means its gini impurity is lower than other feature splits
+The algorithm tested every threshold for every feature. Splitting on Glucose at 154.5 produced the lowest weighted Gini across all candidates — meaning this single question separates diabetic vs non-diabetic patients most cleanly. Patients with Glucose > 154.5 are very likely to be diabetic, so the right branch almost immediately reaches a leaf.
 
 ---
 
-### Step 2 — Try all splits for Age
+## Implementation
 
-Thresholds tried: 30, 40, 50, 57.5
+The implementation has three functions:
 
-**Age <= 30**
+### `is_pure_enough(data)`
 
-- Left: P1 → targets: [0] → pure ✅
-- Right: P2, P3, P4, P5 → targets: [0, 1, 1, 1] → mixed ❌
+Checks whether a node's data is pure enough to stop splitting. It finds the most frequent class in the target column and checks if it makes up ≥ 90% of the samples. Returns the result and the majority class.
 
-**Age <= 40**
-
-- Left: P1, P2 → targets: [0, 0] → pure ✅
-- Right: P3, P4, P5 → targets: [1, 1, 1] → pure ✅
-- **Perfect split! 🎯**
-
-**Age <= 50**
-
-- Left: P1, P2, P3 → targets: [0, 0, 1] → mixed ❌
-- Right: P4, P5 → targets: [1, 1] → pure ✅
-
-**Age <= 57.5**
-
-- Left: P1, P2, P3, P4 → targets: [0, 0, 1, 1] → mixed ❌
-- Right: P5 → targets: [1] → pure ✅
-
-**Best split for Age → Age <= 40** (both sides pure)
-
----
-
-### Step 3 — Compare winners across all features
-
-| Feature | Best Split | Left targets | Right targets | Both pure? |
-| ------- | ---------- | ------------ | ------------- | ---------- |
-| Glucose | <= 105     | [0, 0]       | [1, 1, 1]     | ✅ Yes     |
-| Age     | <= 40      | [0, 0]       | [1, 1, 1]     | ✅ Yes     |
-
-Both splits are equally good here. In a tie, CART picks whichever comes first — so **Glucose <= 105** becomes the root node.
-
----
-
-### Step 4 — The resulting tree
-
-```
-            [Glucose <= 105?]
-               /            \
-             YES              NO
-          [0, 0]           [1, 1, 1]
-        Predict: 0        Predict: 1
-      (Not Diabetic)       (Diabetic)
+```python
+def is_pure_enough(data):
+    most_frequent_value = data.iloc[:,-1].value_counts().idxmax()
+    ocurrence = data.iloc[:,-1].value_counts().max()
+    is_pure = ((ocurrence / len(data)) * 100) >= 90
+    return [is_pure, most_frequent_value]
 ```
 
-Both leaves are pure → no further splitting needed. Tree is complete.
+### `get_best_feature_split(node_data)`
+
+For each feature, generates candidate split thresholds as midpoints between sorted unique values. Then calculates weighted Gini for every threshold and picks the best one per feature. Finally compares across all features and returns the globally best `[feature, split_value]`.
+
+```python
+split_arr = (sorted_feature[:-1] + sorted_feature[1:]) / 2
+```
+
+```python
+weighted_gini = (len(left) / len(data)) * gini_left + (len(right) / len(data)) * gini_right
+```
+
+### `build_tree(node_data)`
+
+The recursive engine. Checks stopping conditions first (purity, min size), then calls `get_best_feature_split()`, splits the data, and recurses on both halves. Each internal node is stored as a Python dict:
+
+```python
+node = {
+    "feature": best_feature,
+    "split_value": best_split_value,
+    "left_node": build_tree(left_node_data),   # recursive
+    "right_node": build_tree(right_node_data)  # recursive
+}
+```
+
+Leaf nodes are just an integer — `0` or `1`.
+
+### Trained Tree Structure
+
+```
+[Glucose <= 154.5?]
+├── YES → [Age <= 28.5?]
+│   ├── ✅ No Diabetes (0)
+│   └── NO  → [Insulin <= 142.5?]
+│       ├── YES → [Glucose <= 100.5?]
+│       │   ├── ✅ No Diabetes (0)
+│       │   └── NO  → [Age <= 47.0?]
+│       │       ├── YES → [BloodPressure <= 79.0?]
+│       │       │   ├── ✅ No Diabetes (0)
+│       │       │   └── 🔴 Diabetes (1)
+│       │       └── ✅ No Diabetes (0)
+│       └── NO  → [BloodPressure <= 77.0?]
+│           ├── ✅ No Diabetes (0)
+│           └── 🔴 Diabetes (1)
+└── NO  → [Insulin <= 544.0?]
+    ├── 🔴 Diabetes (1)
+    └── ✅ No Diabetes (0)
+```
+
+The tree reads naturally: a patient with Glucose > 154.5 and Insulin ≤ 544 is predicted diabetic. A patient with Glucose ≤ 154.5 and Age ≤ 28.5 is predicted non-diabetic. Every path ends at a clear prediction.
+
+To print this tree from your own trained tree, add this function:
+
+```python
+import numbers
+
+def print_tree(node, prefix="", is_left=None):
+    if isinstance(node, numbers.Number):
+        label = "✅ No Diabetes (0)" if node == 0 else "🔴 Diabetes (1)"
+        connector = "├── " if is_left is True else "└── " if is_left is False else ""
+        print(f"{prefix}{connector}{label}")
+        return
+
+    feature = node["feature"]
+    split = node["split_value"]
+
+    if is_left is None:
+        print(f"[{feature} <= {split}?]")
+        child_prefix = ""
+    elif is_left:
+        print(f"{prefix}├── YES → [{feature} <= {split}?]")
+        child_prefix = prefix + "│   "
+    else:
+        print(f"{prefix}└── NO  → [{feature} <= {split}?]")
+        child_prefix = prefix + "    "
+
+    print_tree(node["left_node"],  child_prefix, is_left=True)
+    print_tree(node["right_node"], child_prefix, is_left=False)
+
+print_tree(final_decision_tree)
+```
 
 ---
 
-### Step 5 — Predict a new patient
+## Pruning
 
-New patient: Glucose = 130, Age = 48
+After the tree is built, some internal nodes end up with both children predicting the same class. These nodes add complexity without changing any prediction — they're useless splits.
 
-- Start at root: **Glucose <= 105?** → 130 <= 105? → **NO**
-- Go right → leaf says **Predict: 1 (Diabetic)**
+**Example from this implementation:**
+
+Before pruning, this subtree existed:
+
+```
+[SkinThickness <= 34.5?]
+├── ✅ No Diabetes (0)
+└── ✅ No Diabetes (0)
+```
+
+Both children predict `0`, so the split on SkinThickness is pointless. Pruning collapses this entire subtree into a single leaf: `0`.
+
+### How `prune_tree()` Works
+
+It walks the tree **bottom-up** using recursion. At each internal node, it first recurses into both children (pruning them first), then checks: are both children now leaf nodes with the same value? If yes, replace the entire node with that value.
+
+```python
+def prune_tree(node):
+    if isinstance(node, numbers.Number):
+        return node
+
+    node["left_node"] = prune_tree(node["left_node"])
+    node["right_node"] = prune_tree(node["right_node"])
+
+    if isinstance(node["left_node"], numbers.Number) and isinstance(node["right_node"], numbers.Number):
+        if node["left_node"] == node["right_node"]:
+            return node["left_node"]   # collapse
+
+    return node
+```
+
+The bottom-up order matters — a node can only be pruned after its children are already pruned.
 
 ---
 
-## Key Terms
+## Accuracy
 
-| Term          | Meaning                                                            |
-| ------------- | ------------------------------------------------------------------ |
-| Root node     | The first question — the most important feature                    |
-| Internal node | Any node that still splits further                                 |
-| Leaf node     | End of the tree — gives the final prediction                       |
-| Threshold     | The value used to split a continuous feature (e.g. Glucose <= 105) |
-| Gini Impurity | Measures how mixed a group is. 0 = pure, 0.5 = fully mixed         |
-| Pure node     | A node where all samples belong to the same class                  |
-| Overfitting   | When the tree memorizes training data by growing too deep          |
-| Max depth     | Hyperparameter that limits how deep the tree can grow              |
+Tested on held-out data (samples 373 onwards from the filtered Pima Indians dataset):
 
-> [!NOTE]
-> Read above explaination **twice** so you will get it
+| Metric              | Value      |
+| ------------------- | ---------- |
+| Test samples        | 161        |
+| Correct predictions | 129        |
+| **Accuracy**        | **80.12%** |
+
+**Dataset:** Pima Indians Diabetes dataset. Features used: Glucose, BloodPressure, SkinThickness, Insulin, Age. Removed: Pregnancies, BMI, DiabetesPedigreeFunction. Rows with zero values in any used feature were filtered out.
