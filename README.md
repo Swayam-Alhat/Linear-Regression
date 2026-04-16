@@ -12,6 +12,7 @@ Implementing Machine Learning algorithms from scratch in Python i.e without usin
 
 > [!NOTE]  
 > Each folder is named as specific ML algorithm and contains its implementation.
+  
 > Each folder contains **algorithm.py** which contains actual implementation & **explaination.md** which contains notes about implementation.
 
 ## Foundation
